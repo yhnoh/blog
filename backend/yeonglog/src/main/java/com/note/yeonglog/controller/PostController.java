@@ -41,4 +41,9 @@ public class PostController {
         //저장한 데이터 엔티티 response로 응답하기
         postService.write(request);
     }
+
+    @GetMapping("/posts/{postId}")
+    public Post get(@PathVariable Long postId){
+        return postService.get(postId);
+    }
 }
