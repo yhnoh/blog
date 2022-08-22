@@ -6,14 +6,12 @@ import com.note.yeonglog.response.PostResponse;
 import com.note.yeonglog.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 데이터를 검증하는 역할
@@ -46,5 +44,10 @@ public class PostController {
     @GetMapping("/posts/{postId}")
     public PostResponse get(@PathVariable Long postId){
         return postService.get(postId);
+    }
+
+    @GetMapping("/posts")
+    public List<PostResponse> getList(@PageableDefault(size = 5) Pageable pageable){
+        return postService.getList(pageable);
     }
 }

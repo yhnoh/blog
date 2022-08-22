@@ -6,9 +6,16 @@ import com.note.yeonglog.request.PostCreate;
 import com.note.yeonglog.response.PostResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static org.springframework.data.domain.Sort.*;
 
 @Slf4j
 @Service
@@ -40,4 +47,16 @@ public class PostService {
 
 
     }
+
+    public List<PostResponse> getList(Pageable pageable) {
+
+
+//        PageRequest pageable = PageRequest.of(page, 5, by(Direction.DESC,"id"));
+
+        return postRepository.findAll(pageable).stream()
+                .map(PostResponse::new)
+                .collect(Collectors.toList());
+    }
+
+
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.note.yeonglog.domain.Post;
 import com.note.yeonglog.repository.PostRepository;
 import com.note.yeonglog.request.PostCreate;
+import org.hamcrest.core.Is;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,8 +13,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -131,5 +137,30 @@ public class PostControllerTest {
         assertEquals("내용입니다.", post.getContent());
 
     }
+
+    @Test
+    @DisplayName("글 여러개 조회")
+    void test5() throws Exception {
+        //given
+        List<Post> requestStream = IntStream.range(1, 31)
+                .mapToObj(i -> Post.builder()
+                        .title("foo_" + i)
+                        .content("bar_" + i)
+                        .build())
+                .collect(Collectors.toList());
+        postRepository.saveAll(requestStream);
+
+
+        //when
+        mockMvc.perform(get("/posts?page=1&sort=id,desc"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", Is.is(5)))
+                .andExpect(jsonPath("$.[0].title", Is.is("foo_30")))
+                .andExpect(jsonPath("$.[0].content", Is.is("bar_30")))
+                .andDo(print());
+
+
+    }
+
 
 }
