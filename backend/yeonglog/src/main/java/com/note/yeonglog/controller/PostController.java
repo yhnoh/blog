@@ -2,6 +2,7 @@ package com.note.yeonglog.controller;
 
 import com.note.yeonglog.domain.Post;
 import com.note.yeonglog.request.PostCreate;
+import com.note.yeonglog.response.PostResponse;
 import com.note.yeonglog.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +44,7 @@ public class PostController {
     }
 
     @GetMapping("/posts/{postId}")
-    public Post get(@PathVariable Long postId){
+    public PostResponse get(@PathVariable Long postId){
         return postService.get(postId);
     }
 }

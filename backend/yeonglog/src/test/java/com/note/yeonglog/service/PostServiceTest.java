@@ -1,25 +1,20 @@
 package com.note.yeonglog.service;
 
-import antlr.build.Tool;
 import com.note.yeonglog.domain.Post;
 import com.note.yeonglog.repository.PostRepository;
 import com.note.yeonglog.request.PostCreate;
-import org.assertj.core.api.Assertions;
+import com.note.yeonglog.response.PostResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -67,10 +62,9 @@ public class PostServiceTest {
                 .build();
         postRepository.save(entity);
 
-        Long postId = 1L;
 
         //geiven
-        Post post = postService.get(entity.getId());
+        PostResponse post = postService.get(entity.getId());
 
         assertNotNull(post);
         assertEquals(1,  postRepository.count());
@@ -84,7 +78,7 @@ public class PostServiceTest {
     void test3() throws Exception {
         //given
         Post savePost = Post.builder()
-                .title("foo")
+                .title("123456789")
                 .content("bar")
                 .build();
         postRepository.save(savePost);
@@ -92,8 +86,8 @@ public class PostServiceTest {
         //when
         mockMvc.perform(get("/posts/{postId}", savePost.getId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value("1"))
-                .andExpect(jsonPath("$.title").value("foo"))
+                .andExpect(jsonPath("$.id").value(savePost.getId()))
+                .andExpect(jsonPath("$.title").value("123456789"))
                 .andExpect(jsonPath("$.content").value("bar"))
                 .andDo(print());
 
