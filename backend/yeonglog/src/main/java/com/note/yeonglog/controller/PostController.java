@@ -2,6 +2,7 @@ package com.note.yeonglog.controller;
 
 import com.note.yeonglog.domain.Post;
 import com.note.yeonglog.request.PostCreate;
+import com.note.yeonglog.request.PostSearch;
 import com.note.yeonglog.response.PostResponse;
 import com.note.yeonglog.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -47,7 +48,7 @@ public class PostController {
     }
 
     @GetMapping("/posts")
-    public List<PostResponse> getList(@PageableDefault(size = 5) Pageable pageable){
-        return postService.getList(pageable);
+    public List<PostResponse> getList(PostSearch postSearch){
+        return postService.getList(postSearch);
     }
 }

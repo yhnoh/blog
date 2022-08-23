@@ -3,6 +3,7 @@ package com.note.yeonglog.service;
 import com.note.yeonglog.domain.Post;
 import com.note.yeonglog.repository.PostRepository;
 import com.note.yeonglog.request.PostCreate;
+import com.note.yeonglog.request.PostSearch;
 import com.note.yeonglog.response.PostResponse;
 import org.hamcrest.core.Is;
 import org.junit.jupiter.api.BeforeEach;
@@ -106,7 +107,7 @@ public class PostServiceTest {
     @DisplayName("글 첫페이지 조회")
     void test4() throws Exception {
         //given
-        List<Post> requestStream = IntStream.range(1, 31)
+        List<Post> requestStream = IntStream.range(0, 20)
                 .mapToObj(i -> Post.builder()
                         .title("foo_" + i)
                         .content("bar_" + i)
@@ -114,14 +115,16 @@ public class PostServiceTest {
                 .collect(Collectors.toList());
         postRepository.saveAll(requestStream);
 
-        Pageable pageable = PageRequest.of(0, 5, Sort.Direction.DESC, "id");
+        PostSearch postSearch = PostSearch.builder()
+                .page(1)
+                .build();
+
         //when
-        List<PostResponse> posts = postService.getList(pageable);
+        List<PostResponse> posts = postService.getList(postSearch);
 
         //then
-        assertEquals(5, posts.size());
-        assertEquals("foo_30", posts.get(0).getTitle());
-        assertEquals("foo_26", posts.get(4).getTitle());
+        assertEquals(10, posts.size());
+        assertEquals("foo_19", posts.get(0).getTitle());
 
 
     }

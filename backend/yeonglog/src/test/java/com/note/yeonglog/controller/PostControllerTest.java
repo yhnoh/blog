@@ -152,9 +152,9 @@ public class PostControllerTest {
 
 
         //when
-        mockMvc.perform(get("/posts?page=1&sort=id,desc"))
+        mockMvc.perform(get("/posts?page=1&size=10"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()", Is.is(5)))
+                .andExpect(jsonPath("$.length()", Is.is(10)))
                 .andExpect(jsonPath("$.[0].title", Is.is("foo_30")))
                 .andExpect(jsonPath("$.[0].content", Is.is("bar_30")))
                 .andDo(print());

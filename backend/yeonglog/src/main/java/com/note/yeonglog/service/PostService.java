@@ -3,6 +3,7 @@ package com.note.yeonglog.service;
 import com.note.yeonglog.domain.Post;
 import com.note.yeonglog.repository.PostRepository;
 import com.note.yeonglog.request.PostCreate;
+import com.note.yeonglog.request.PostSearch;
 import com.note.yeonglog.response.PostResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,15 +49,13 @@ public class PostService {
 
     }
 
-    public List<PostResponse> getList(Pageable pageable) {
+    public List<PostResponse> getList(PostSearch postSearch) {
 
-
-//        PageRequest pageable = PageRequest.of(page, 5, by(Direction.DESC,"id"));
-
-        return postRepository.findAll(pageable).stream()
+        return postRepository.getList(postSearch).stream()
                 .map(PostResponse::new)
                 .collect(Collectors.toList());
     }
+
 
 
 }
