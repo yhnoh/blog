@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.note.yeonglog.domain.Post;
 import com.note.yeonglog.repository.PostRepository;
 import com.note.yeonglog.request.PostCreate;
+import com.note.yeonglog.request.PostEdit;
 import org.hamcrest.core.Is;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,8 +20,7 @@ import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -162,5 +162,45 @@ public class PostControllerTest {
 
     }
 
+    @Test
+    @DisplayName("글 제목 수정")
+    void test6() throws Exception {
+        //given
+        Post savePost = Post.builder()
+                .title("foo")
+                .content("bar")
+                .build();
+        postRepository.save(savePost);
 
+        PostEdit postEdit = PostEdit.builder()
+                .title("foo_edit")
+                .content("bar_edit")
+                .build();
+
+        //when
+        mockMvc.perform(patch("/posts/{postId}", savePost.getId())
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(postEdit)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value("foo_edit"))
+                .andExpect(jsonPath("$.content").value("bar_edit"))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("글 삭제")
+    public void test7() throws Exception {
+
+        //given
+        Post savePost = Post.builder()
+                .title("foo")
+                .content("bar")
+                .build();
+        postRepository.save(savePost);
+
+        //expected
+        mockMvc.perform(delete("/posts/{postId}", savePost.getId()))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
 }

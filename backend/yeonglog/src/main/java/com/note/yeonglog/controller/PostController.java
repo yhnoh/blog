@@ -2,6 +2,7 @@ package com.note.yeonglog.controller;
 
 import com.note.yeonglog.domain.Post;
 import com.note.yeonglog.request.PostCreate;
+import com.note.yeonglog.request.PostEdit;
 import com.note.yeonglog.request.PostSearch;
 import com.note.yeonglog.response.PostResponse;
 import com.note.yeonglog.service.PostService;
@@ -50,5 +51,15 @@ public class PostController {
     @GetMapping("/posts")
     public List<PostResponse> getList(PostSearch postSearch){
         return postService.getList(postSearch);
+    }
+
+    @PatchMapping("/posts/{postId}")
+    public PostResponse edit(@PathVariable Long postId, @RequestBody @Valid PostEdit postEdit){
+        return postService.edit(postId, postEdit);
+    }
+
+    @DeleteMapping("/posts/{postId}")
+    public void delete(@PathVariable Long postId){
+        postService.delete(postId);
     }
 }

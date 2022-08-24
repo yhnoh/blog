@@ -1,22 +1,20 @@
 package com.note.yeonglog.service;
 
 import com.note.yeonglog.domain.Post;
+import com.note.yeonglog.domain.PostEditor;
+import com.note.yeonglog.exception.PostNotFound;
 import com.note.yeonglog.repository.PostRepository;
 import com.note.yeonglog.request.PostCreate;
+import com.note.yeonglog.request.PostEdit;
 import com.note.yeonglog.request.PostSearch;
 import com.note.yeonglog.response.PostResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static org.springframework.data.domain.Sort.*;
 
 @Slf4j
 @Service
@@ -35,8 +33,7 @@ public class PostService {
 
     public PostResponse get(Long postId) {
 
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 글입니다."));
+        Post post = checkNullPost(postId);
 
         PostResponse postResponse = PostResponse.builder()
                 .id(post.getId())
@@ -49,6 +46,11 @@ public class PostService {
 
     }
 
+    private Post checkNullPost(Long postId) {
+        return postRepository.findById(postId)
+                .orElseThrow(() -> new PostNotFound());
+    }
+
     public List<PostResponse> getList(PostSearch postSearch) {
 
         return postRepository.getList(postSearch).stream()
@@ -56,6 +58,23 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
+    public PostResponse edit(Long id, PostEdit postEdit){
+        Post post = checkNullPost(id);
 
+        PostEditor postEditor = PostEditor.builder()
+                .post(post)
+                .title(postEdit.getTitle())
+                .content(postEdit.getContent())
+                .build();
+
+        post.edit(postEditor);
+        return new PostResponse(post.getId(), post.getTitle(), post.getContent());
+    }
+
+    public void delete(long id) {
+        Post post = checkNullPost(id);
+        postRepository.delete(post);
+    }
 
 }

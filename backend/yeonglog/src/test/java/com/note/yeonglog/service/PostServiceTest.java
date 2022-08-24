@@ -1,11 +1,14 @@
 package com.note.yeonglog.service;
 
 import com.note.yeonglog.domain.Post;
+import com.note.yeonglog.exception.PostNotFound;
 import com.note.yeonglog.repository.PostRepository;
 import com.note.yeonglog.request.PostCreate;
+import com.note.yeonglog.request.PostEdit;
 import com.note.yeonglog.request.PostSearch;
 import com.note.yeonglog.response.PostResponse;
 import org.hamcrest.core.Is;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,11 +19,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -126,6 +131,133 @@ public class PostServiceTest {
         assertEquals(10, posts.size());
         assertEquals("foo_19", posts.get(0).getTitle());
 
+
+    }
+
+    @Test
+    @DisplayName("글 수정")
+    void test5() throws Exception {
+        //given
+        Post savePost = Post.builder()
+                .title("foo")
+                .content("bar")
+                .build();
+        postRepository.save(savePost);
+
+        PostEdit postEdit = PostEdit.builder()
+                .title("foo_edit")
+                .build();
+        //when
+        postService.edit(savePost.getId(), postEdit);
+
+        //then
+        Post editPost = postRepository.findById(savePost.getId())
+                .orElseThrow(() -> new RuntimeException("글이 존재하지 않습니다. " + savePost.getId()));
+
+        assertEquals("foo_edit", editPost.getTitle());
+        assertEquals("bar", editPost.getContent());
+    }
+
+    @Test
+    @DisplayName("글 내용 수정")
+    void test6() throws Exception {
+        //given
+        Post savePost = Post.builder()
+                .title("foo")
+                .content("bar")
+                .build();
+        postRepository.save(savePost);
+
+        PostEdit postEdit = PostEdit.builder()
+                .content("bar_edit")
+                .build();
+        //when
+        postService.edit(savePost.getId(), postEdit);
+
+        //then
+        Post editPost = postRepository.findById(savePost.getId())
+                .orElseThrow(() -> new RuntimeException("글이 존재하지 않습니다. " + savePost.getId()));
+
+        assertEquals("foo", editPost.getTitle());
+        assertEquals("bar_edit", editPost.getContent());
+    }
+
+    @Test
+    @DisplayName("글 삭제")
+    public void test7(){
+        //given
+        Post savePost = Post.builder()
+                .title("foo")
+                .content("bar")
+                .build();
+        postRepository.save(savePost);
+
+        //when
+        postService.delete(savePost.getId());
+        //then
+        assertEquals(0, postRepository.count());
+    }
+
+    @Test
+    @DisplayName("글 1개 조회 - 존재하지 않는 글")
+    public void test8() {
+
+        //given
+        Post savePost = Post.builder()
+                .title("foo")
+                .content("bar")
+                .build();
+        postRepository.save(savePost);
+
+        //when
+        PostNotFound e = assertThrows(PostNotFound.class, () -> {
+            PostResponse post = postService.get(savePost.getId() + 1);
+        });
+
+        //then
+        assertEquals("존재하지 않은 글입니다.", e.getMessage());
+    }
+
+    @Test
+    @DisplayName("글 삭제 - 존재하지 않는 글")
+    public void test9(){
+        //given
+        Post savePost = Post.builder()
+                .title("foo")
+                .content("bar")
+                .build();
+        postRepository.save(savePost);
+
+        //when
+        //when
+        PostNotFound e = assertThrows(PostNotFound.class, () -> {
+            postService.delete(savePost.getId() + 1);
+        });
+
+        //then
+        assertEquals("존재하지 않은 글입니다.", e.getMessage());
+
+    }
+
+    @Test
+    @DisplayName("글 내용 수정 - 존재하지 않느 글")
+    void test10() throws Exception {
+        //given
+        Post savePost = Post.builder()
+                .title("foo")
+                .content("bar")
+                .build();
+        postRepository.save(savePost);
+
+        PostEdit postEdit = PostEdit.builder()
+                .content("bar_edit")
+                .build();
+        //when
+        PostNotFound e = assertThrows(PostNotFound.class, () -> {
+            postService.edit(savePost.getId() + 1, postEdit);
+        });
+        //then
+        assertEquals("존재하지 않은 글입니다.", e.getMessage());
 
     }
 
