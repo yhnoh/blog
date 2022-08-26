@@ -1,6 +1,7 @@
 package com.note.yeonglog.controller;
 
 import com.note.yeonglog.domain.Post;
+import com.note.yeonglog.exception.InvalidRequest;
 import com.note.yeonglog.request.PostCreate;
 import com.note.yeonglog.request.PostEdit;
 import com.note.yeonglog.request.PostSearch;
@@ -39,6 +40,8 @@ public class PostController {
 
     @PostMapping("/posts")
     public void post(@RequestBody @Valid PostCreate request) throws Exception {
+        request.validate();
+
         //저장한 데이터 엔티티 response로 응답하기
         postService.write(request);
     }

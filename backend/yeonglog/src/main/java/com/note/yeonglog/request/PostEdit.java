@@ -1,15 +1,16 @@
 package com.note.yeonglog.request;
 
-import com.note.yeonglog.exception.InvalidRequest;
+import com.note.yeonglog.domain.Post;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
+import java.util.Optional;
 
 @Setter
 @Getter
-public class PostCreate {
+public class PostEdit {
 
     @NotBlank(message = "타이틀을 입력해 주세요.")
     private String title;
@@ -18,14 +19,8 @@ public class PostCreate {
     private String content;
 
     @Builder
-    public PostCreate(String title, String content) {
+    public PostEdit(String title, String content) {
         this.title = title;
         this.content = content;
-    }
-
-    public void validate(){
-        if(getTitle().contains("바보")){
-            throw new InvalidRequest("title", "바보는 포함할 수 없는 단어입니다.");
-        }
     }
 }
